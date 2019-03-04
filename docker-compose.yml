@@ -1,0 +1,41 @@
+version: "3"
+services:
+
+  reverse-proxy:
+    image: custom-nginx
+    ports:
+      - 8080:8080
+    restart: always
+
+  react-app:
+    depends_on:
+      - reverse-proxy
+    image: sample-react
+    container_name: react-container
+    build:
+      context: ./react-app
+      dockerfile: Dockerfile
+    volumes:
+      - '.:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    environment:
+      - NODE_ENV=development
+    restart: always
+  
+  node-app:
+    depends_on:
+      - reverse-proxy
+    image: node-api
+    container_name: node-container
+    build:
+      context: ./express-api
+      dockerfile: Dockerfile
+    volumes:
+      - '.:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    environment:
+      - NODE_ENV=development
+    restart: always
+    
+    
+    
